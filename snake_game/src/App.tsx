@@ -11,7 +11,7 @@ class App extends React.Component {
     readonly stageHeight = 304;
     readonly stageBorderWidth = 2;
     readonly pixelWidth = 10
-    readonly initalFlashTime = 1000;
+    readonly initalFlashTime = 300;
     readonly levelUpMinusTime = 30;
 
     private food = React.createRef<Food>();
@@ -20,7 +20,7 @@ class App extends React.Component {
 
     private direction: Direction | undefined;
     private flashTime: number;
-    timeout: NodeJS.Timeout | undefined;
+    private timeout: NodeJS.Timeout | undefined;
 
     get stageBoundary() {
         let extra = this.stageBorderWidth * 2 + this.pixelWidth;
@@ -52,15 +52,20 @@ class App extends React.Component {
         if (this.direction != undefined) {
             if (!snake.stepOne(this.direction)) {
                 alert("游戏结束");
+                clearTimeout(this.timeout);
                 return;
             }
             let snakeHead = snake.headPosition;
             let fp = food?.position;
             if (snakeHead.x == fp?.x && snakeHead.y == fp.y) {
                 scorePanel.addScore();
-                this.flashTime = Math.max(0,
+                this.flashTime = Math.max(1,
                     this.initalFlashTime - scorePanel.level * this.levelUpMinusTime);
-                snake.grow();
+                if (!snake.grow()) {
+                    alert("游戏结束");
+                    clearTimeout(this.timeout);
+                    return;
+                }
                 food?.change();
             }
         }
@@ -91,9 +96,13 @@ class App extends React.Component {
                 return;
         }
 
-        let shouldUpdate = this.direction == undefined
-            || (this.isHorizontal(this.direction) && !this.isHorizontal(newDirection))
-            || (!this.isHorizontal(this.direction) && this.isHorizontal(newDirection));
+        const snake = this.snake.current;
+        let snakeIsHorizontal = this.isHorizontal(snake?.headDirection);
+        let evIsHorizontal = this.isHorizontal(newDirection);
+        let shouldUpdate = snake?.headDirection == undefined
+            || snake?.length == 1
+            || snakeIsHorizontal && !evIsHorizontal
+            || !snakeIsHorizontal && evIsHorizontal;
         if (shouldUpdate) {
             this.direction = newDirection;
         }
@@ -114,7 +123,7 @@ class App extends React.Component {
                     borderWidth: 10,
                     borderStyle: "solid",
                     borderColor: "black",
-                    borderRadius: 40,
+                    borderRadius: 20,
                     display: "flex",
                     flexFlow: "column",
                     alignItems: "center",

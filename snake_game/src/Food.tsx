@@ -18,23 +18,24 @@ export default class Food extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.setupState(props);
+        let color = this.getRandomColor();
+        this.state = { ...this.state, color };
+        this.updateState(props);
     }
 
     componentWillReceiveProps(props: Props) {
-        this.setupState(props);
+        this.updateState(props);
     }
 
-    private setupState(props: Props) {
+    private updateState(props: Props) {
         let position: Point;
-        let color = this.getRandomColor();
         if (props.initalPosition.isInBoundary(props.boundary)) {
             position = props.initalPosition;
         } else {
             let { boundary, width, height } = this.props;
             position = boundary.genarateRandomPoint(width, height)
         }
-        this.state = { position, color };
+        this.state = { ...this.state, position };
     }
 
     get position(): Point {

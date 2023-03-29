@@ -8,6 +8,7 @@ type State = {
 export default class ScorePanel extends React.Component<{}, State> {
 
     readonly levelScore = 5;
+    readonly maxLevel = 10;
 
     constructor(props: {}) {
         super(props);
@@ -21,7 +22,9 @@ export default class ScorePanel extends React.Component<{}, State> {
         let { score, level } = this.state;
         score++;
         if (score % this.levelScore == 0) {
-            level++;
+            if (level < this.maxLevel) {
+                level++;
+            }
         }
         this.setState({ score, level });
     }
