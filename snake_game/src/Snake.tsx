@@ -1,5 +1,3 @@
-import { dir } from "console";
-import { Dir } from "fs";
 import React from "react";
 import App from "./App";
 import { Boundary, Direction, Point } from "./Types";
